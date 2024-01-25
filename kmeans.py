@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-
+import matplotlib.pyplot as plt
 
 
 def find_closest_centroids(X,centroids): 
@@ -35,6 +35,21 @@ def compute_centroids(X,idx,K):
     return centroids
 
 
+def RunKMeans(X,initial_centroids,max_iters=10):
+    row,col = X.shape
+    K = initial_centroids.shape[0]
+    centroids = initial_centroids
+    prev_centroids = centroids
+    idx = np.zeros(row)
+
+    for i in range(max_iters):
+        print("K-Means iteration %d/%d" % (i,max_iters-1))
+        idx = find_closest_centroids(X,centroids)
+        centroids = compute_centroids(X,idx,K)
+    plt.show()
+    return centroids,idx
+
+
 
 X = np.random.uniform(1,101,size = (100,2))
 print(X[:5])
@@ -43,9 +58,27 @@ random_indices = np.random.choice(X.shape[0],size=4,replace=False)
 random_points = X[random_indices]
 """ selecting random 3 points from training example as initial centroids"""
 initial_centroids = random_points
-idx = find_closest_centroids(X,initial_centroids)
-print("First 3 elements in idx : ", idx[:3])
+max_iters = 10
+centroids,idx = RunKMeans(X,initial_centroids,max_iters)
 
-print("Initial centroids : ", initial_centroids)
-new_centroids = compute_centroids(X,idx,4)
-print("New centroids : ", new_centroids)
+# Plot data points
+plt.scatter(X[:, 0], X[:, 1], color='blue', label='Data Points')
+
+# Plot centroids
+plt.scatter(centroids[:, 0], centroids[:, 1], marker='x', color='red', label='Centroids')
+
+# Annotate centroids with cluster numbers
+for i, centroid in enumerate(centroids):
+    plt.text(centroid[0], centroid[1], f'Cluster {i+1}', fontsize=12, ha='center', va='center')
+
+# Set plot labels and title
+plt.xlabel('X-axis')
+plt.ylabel('Y-axis')
+plt.title('K-means Clustering')
+
+# Add legend
+plt.legend()
+
+# Show plot
+plt.grid(True)
+plt.show()
